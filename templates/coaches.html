@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}কোচ তথ্য | Bangladesh Railway{% endblock %}
+
+{% block content %}
+<!-- Train Header -->
+<div class="train-header-card">
+    <div class="train-banner">
+        <h2><i class="fas fa-subway"></i> {{ train.TrainName }}</h2>
+        <p>Train No: {{ train.TrainNumber }} | কোচ ও আসন বিবরণ</p>
+    </div>
+    <div class="train-stats">
+        <div class="train-stat">
+            <div class="train-stat-value">{{ train.TotalSeats }}</div>
+            <div class="train-stat-label">Total Seats</div>
+        </div>
+        <div class="train-stat">
+            <div class="train-stat-value">{{ coaches|length }}</div>
+            <div class="train-stat-label">Coaches</div>
+        </div>
+        <div class="train-stat">
+            <div class="train-stat-value">{{ coaches|selectattr('has_ac')|list|length }}</div>
+            <div class="train-stat-label">AC Coaches</div>
+        </div>
+    </div>
+</div>
+
+{% if coaches %}
+<div class="coaches-grid">
+    {% for coach in coaches %}
+    <div class="coach-card">
+        <div class="coach-badge {{ 'ac' if coach.has_ac else 'non-ac' }}">
+            <span class="coach-name">
+                <i class="fas fa-{{ 'snowflake' if coach.has_ac else 'chair' }}"></i>
+                {{ coach.class_name }}
+            </span>
+            <span class="coach-number">{{ coach.coach_number }}</span>
+        </div>
+        <div class="coach-body">
+            <div class="coach-info-grid">
+                <div class="coach-info-item">
+                    <div class="coach-info-label">Class Code</div>
+                    <div class="coach-info-value">{{ coach.class_code }}</div>
+                </div>
+                <div class="coach-info-item">
+                    <div class="coach-info-label">Total Seats</div>
+                    <div class="coach-info-value">{{ coach.total_seats }}</div>
+                </div>
+                <div class="coach-info-item">
+                    <div class="coach-info-label">Actual Seats</div>
+                    <div class="coach-info-value">{{ coach.actual_seats }}</div>
+                </div>
+                <div class="coach-info-item">
+                    <div class="coach-info-label">Air Conditioned</div>
+                    <div class="coach-info-value">
+                        {% if coach.has_ac %}
+                        <span class="ac-tag ac-yes"><i class="fas fa-snowflake"></i> AC</span>
+                        {% else %}
+                        <span class="ac-tag ac-no"><i class="fas fa-fan"></i> Non-AC</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-train"></i>
+    <h3>কোচ তথ্য নেই</h3>
+    <p>No coach data available for this train.</p>
+</div>
+{% endif %}
+{% endblock %}

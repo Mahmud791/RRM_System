@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}টিকেট সফল | Bangladesh Railway{% endblock %}
+
+{% block content %}
+<div class="card success-card">
+    <div class="card-header-green" style="padding: 40px;">
+        <div class="success-icon" style="background: rgba(255,255,255,0.2); margin: 0 auto 15px;">
+            <i class="fas fa-check-circle" style="color: white;"></i>
+        </div>
+        <h2>টিকেট সফলভাবে বুক হয়েছে!</h2>
+        <p>Ticket Booked Successfully!</p>
+    </div>
+
+    <div style="padding: 30px;">
+        <!-- Ticket Summary -->
+        <div class="payment-summary">
+            <div class="payment-summary-row">
+                <span><i class="fas fa-hashtag"></i> টিকেট নং</span>
+                <span><strong>#{{ ticket.TicketID }}</strong></span>
+            </div>
+            {% if ticket.pnr_number %}
+            <div class="payment-summary-row">
+                <span><i class="fas fa-qrcode"></i> PNR নম্বর</span>
+                <span><strong>{{ ticket.pnr_number }}</strong></span>
+            </div>
+            {% endif %}
+            <div class="payment-summary-row">
+                <span><i class="fas fa-user"></i> যাত্রীর নাম</span>
+                <span>{{ ticket.FullName }}</span>
+            </div>
+            <div class="payment-summary-row">
+                <span><i class="fas fa-train"></i> ট্রেন</span>
+                <span>{{ ticket.TrainName }} ({{ ticket.TrainNumber }})</span>
+            </div>
+            <div class="payment-summary-row">
+                <span><i class="fas fa-map-marker-alt"></i> রুট</span>
+                <span>{{ ticket.SourceStation }} → {{ ticket.DestinationStation }}</span>
+            </div>
+            <div class="payment-summary-row">
+                <span><i class="fas fa-clock"></i> ছাড়ার সময়</span>
+                <span>{{ ticket.DepartureTime }}</span>
+            </div>
+            <div class="payment-summary-row">
+                <span><i class="fas fa-clock"></i> পৌঁছানোর সময়</span>
+                <span>{{ ticket.ArrivalTime }}</span>
+            </div>
+            <div class="payment-summary-row">
+                <span><i class="fas fa-credit-card"></i> পেমেন্ট</span>
+                <span>
+                    {{ ticket.Method }}
+                    {% if ticket.payment_status == 'Completed' %}
+                        <span class="status-badge confirmed" style="margin-left: 5px;">✓ Paid</span>
+                    {% else %}
+                        <span class="status-badge pending" style="margin-left: 5px;">Pending</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% if ticket.transaction_id %}
+            <div class="payment-summary-row">
+                <span><i class="fas fa-receipt"></i> Transaction ID</span>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">{{ ticket.transaction_id }}</span>
+            </div>
+            {% endif %}
+            <div class="payment-summary-row total">
+                <span>মোট ভাড়া | Total Fare</span>
+                <span>৳{{ "%.2f"|format(ticket.Amount or 0) }}</span>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="success-actions">
+            <a href="/ticket/{{ ticket.TicketID }}/download" class="btn btn-primary">
+                <i class="fas fa-download"></i> PDF ডাউনলোড | Download Ticket
+            </a>
+            {% if session.get('user_id') %}
+            <a href="/dashboard" class="btn btn-outline" style="color: var(--primary); border-color: var(--primary);">
+                <i class="fas fa-tachometer-alt"></i> ড্যাশবোর্ড
+            </a>
+            {% endif %}
+            <a href="/" class="btn btn-outline" style="color: var(--primary); border-color: var(--primary);">
+                <i class="fas fa-home"></i> হোমপেজ
+            </a>
+        </div>
+
+        <!-- Tip -->
+        <div style="margin-top: 25px; padding: 15px; background: var(--success-bg); border-radius: var(--radius); text-align: center;">
+            <i class="fas fa-info-circle" style="color: var(--success);"></i>
+            <span style="font-size: 0.85rem; color: var(--success-text);">
+                আপনার টিকেটটি PDF হিসেবে ডাউনলোড করে সংরক্ষণ করুন | Save your ticket by downloading the PDF
+            </span>
+        </div>
+    </div>
+</div>
+{% endblock %}

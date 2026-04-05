@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="বাংলাদেশ রেলওয়ে অনলাইন টিকেট বুকিং সিস্টেম | Bangladesh Railway Online Ticket Booking System">
+    <title>{% block title %}Bangladesh Railway | ট্রেন টিকেট বুকিং{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <div class="{% block header_class %}header{% endblock %}">
+        <div class="container">
+            <div class="navbar">
+                <div class="logo">
+                    <h1><i class="fas fa-train"></i> বাংলাদেশ রেলওয়ে</h1>
+                    <p>Bangladesh Railway | ট্রেন টিকেট বুকিং সিস্টেম</p>
+                </div>
+                <div class="nav-links">
+                    <a href="/" class="nav-btn nav-btn-outline"><i class="fas fa-home"></i> হোম</a>
+                    <a href="/stations" class="nav-btn nav-btn-outline"><i class="fas fa-map-marker-alt"></i> স্টেশন</a>
+                    {% if session.get('user_id') %}
+                        <a href="/dashboard" class="nav-btn nav-btn-outline"><i class="fas fa-tachometer-alt"></i> ড্যাশবোর্ড</a>
+                        <a href="/bookings" class="nav-btn nav-btn-outline"><i class="fas fa-ticket-alt"></i> টিকেট</a>
+                        {% if session.get('role') == 'Admin' %}
+                            <a href="/admin" class="nav-btn nav-btn-primary"><i class="fas fa-shield-alt"></i> অ্যাডমিন</a>
+                        {% endif %}
+                        <a href="/profile" class="nav-btn nav-btn-outline" style="border-radius: 50px; padding: 8px 15px;"><i class="fas fa-user-circle"></i> {{ session.get('fullname', 'User') }}</a>
+                        <a href="/logout" class="nav-btn nav-btn-danger"><i class="fas fa-sign-out-alt"></i> লগআউট</a>
+                    {% else %}
+                        <a href="/login" class="nav-btn nav-btn-outline"><i class="fas fa-sign-in-alt"></i> লগইন</a>
+                        <a href="/register" class="nav-btn nav-btn-primary"><i class="fas fa-user-plus"></i> নিবন্ধন</a>
+                    {% endif %}
+                    <a href="/about" class="nav-btn nav-btn-outline"><i class="fas fa-info-circle"></i> সম্পর্কে</a>
+                </div>
+            </div>
+            {% block hero %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'warning' %}exclamation-triangle{% elif category == 'info' %}info-circle{% else %}exclamation-circle{% endif %}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4><i class="fas fa-train"></i> বাংলাদেশ রেলওয়ে</h4>
+                    <p>Bangladesh Railway Reservation System<br>সহজে ট্রেন টিকেট বুক করুন</p>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-link"></i> লিংক | Links</h4>
+                    <p>
+                        <a href="/">হোম | Home</a><br>
+                        <a href="/bookings">আমার টিকেট | My Bookings</a><br>
+                        <a href="/stations">স্টেশন | Stations</a><br>
+                        <a href="/about">আমাদের সম্পর্কে | About</a>
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-phone"></i> যোগাযোগ | Contact</h4>
+                    <p>হেল্পলাইন: ১৬২৩৪<br>
+                    ইমেইল: help@railway.gov.bd</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 বাংলাদেশ রেলওয়ে | Bangladesh Railway Reservation System</p>
+                <p>DBMS Project | Database Management System Project</p>
+            </div>
+        </div>
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

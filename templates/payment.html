@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}পেমেন্ট | Bangladesh Railway{% endblock %}
+
+{% block content %}
+<div class="card payment-card">
+    <div class="card-header-green">
+        <h2><i class="fas fa-credit-card"></i> পেমেন্ট করুন</h2>
+        <p>Complete your payment | {{ payment.Method }} দিয়ে পেমেন্ট সম্পন্ন করুন</p>
+    </div>
+
+    <div style="padding: 30px;">
+        <!-- Payment Summary -->
+        <div class="payment-summary">
+            <h4 style="margin-bottom: 12px; color: var(--text);"><i class="fas fa-receipt"></i> পেমেন্ট সারসংক্ষেপ</h4>
+            <div class="payment-summary-row">
+                <span>যাত্রীর নাম | Passenger</span>
+                <span>{{ payment.FullName }}</span>
+            </div>
+            <div class="payment-summary-row">
+                <span>ট্রেন | Train</span>
+                <span>{{ payment.TrainName }}</span>
+            </div>
+            <div class="payment-summary-row">
+                <span>রুট | Route</span>
+                <span>{{ payment.SourceStation }} → {{ payment.DestinationStation }}</span>
+            </div>
+            <div class="payment-summary-row">
+                <span>পেমেন্ট পদ্ধতি | Method</span>
+                <span><strong>{{ payment.Method }}</strong></span>
+            </div>
+            <div class="payment-summary-row">
+                <span>লেনদেন নং | Transaction</span>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">{{ payment.transaction_id }}</span>
+            </div>
+            <div class="payment-summary-row total">
+                <span>মোট পরিমাণ | Total Amount</span>
+                <span>৳{{ "%.2f"|format(payment.Amount) }}</span>
+            </div>
+        </div>
+
+        <!-- Payment Form -->
+        <div id="paymentForm">
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                {% if payment.Method in ['Credit Card', 'Debit Card'] %}
+                <!-- Card Payment Form -->
+                <h4 style="margin-bottom: 15px; color: var(--text);"><i class="fas fa-credit-card"></i> কার্ডের তথ্য | Card Details</h4>
+
+                <div class="form-group">
+                    <label><i class="fas fa-hashtag"></i> কার্ড নম্বর | Card Number *</label>
+                    <input type="text" name="card_number" required maxlength="19"
+                           placeholder="4111 1111 1111 1111"
+                           oninput="formatCardNumber(this)" autocomplete="cc-number">
+                    <div class="form-text">
+                        <i class="fas fa-info-circle"></i> টেস্ট কার্ড: 4111 1111 1111 1111 অথবা 4242 4242 4242 4242
+                    </div>
+                </div>
+
+                <div class="card-inputs">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> মেয়াদ | Expiry (MM/YY) *</label>
+                        <input type="text" name="expiry" required maxlength="5"
+                               placeholder="12/28" oninput="formatExpiry(this)" autocomplete="cc-exp">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> CVV *</label>
+                        <input type="password" name="cvv" required maxlength="4"
+                               placeholder="123" autocomplete="cc-csc">
+                    </div>
+                </div>
+
+                {% elif payment.Method in ['bKash', 'Nagad', 'Rocket'] %}
+                <!-- Mobile Payment Form -->
+                <h4 style="margin-bottom: 15px; color: var(--text);">
+                    <i class="fas fa-mobile-alt"></i> {{ payment.Method }} পেমেন্ট
+                </h4>
+
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> মোবাইল নম্বর | Mobile Number *</label>
+                    <input type="text" name="mobile_number" required maxlength="11"
+                           placeholder="01XXXXXXXXX" pattern="[0-9]{11}">
+                    <div class="form-text">
+                        <i class="fas fa-info-circle"></i> ১১ ডিজিটের বাংলাদেশী মোবাইল নম্বর (যেমন: 01712345678)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> পিন | PIN *</label>
+                    <input type="password" name="pin" required maxlength="6" minlength="4"
+                           placeholder="আপনার {{ payment.Method }} পিন">
+                    <div class="form-text">
+                        <i class="fas fa-info-circle"></i> যেকোন ৪+ ডিজিটের পিন দিন (ডেমো)
+                    </div>
+                </div>
+                {% endif %}
+
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
+                    <button type="submit" class="btn btn-accent btn-block" id="payBtn" onclick="showProcessing()">
+                        <i class="fas fa-check-circle"></i> ৳{{ "%.2f"|format(payment.Amount) }} পেমেন্ট করুন | Pay Now
+                    </button>
+                    <a href="/" class="btn btn-outline" style="flex: 0.4;">
+                        <i class="fas fa-times"></i> বাতিল
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Processing Animation -->
+        <div class="payment-processing" id="processingState">
+            <div class="spinner"></div>
+            <h3>পেমেন্ট প্রসেস হচ্ছে...</h3>
+            <p>Payment is being processed. অনুগ্রহ করে অপেক্ষা করুন।</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function formatCardNumber(input) {
+        let value = input.value.replace(/\D/g, '');
+        let formatted = '';
+        for (let i = 0; i < value.length && i < 16; i++) {
+            if (i > 0 && i % 4 === 0) formatted += ' ';
+            formatted += value[i];
+        }
+        input.value = formatted;
+    }
+
+    function formatExpiry(input) {
+        let value = input.value.replace(/\D/g, '');
+        if (value.length >= 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2, 4);
+        }
+        input.value = value;
+    }
+
+    function showProcessing() {
+        setTimeout(function() {
+            document.getElementById('paymentForm').style.display = 'none';
+            document.getElementById('processingState').style.display = 'block';
+        }, 100);
+    }
+</script>
+{% endblock %}

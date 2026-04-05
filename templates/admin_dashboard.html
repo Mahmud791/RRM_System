@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}অ্যাডমিন ড্যাশবোর্ড | Bangladesh Railway{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-shield-alt"></i> অ্যাডমিন ড্যাশবোর্ড</h2>
+    <p>Admin Dashboard | সিস্টেম ওভারভিউ</p>
+</div>
+
+<!-- KPI Cards -->
+<div class="dashboard-grid">
+    <div class="kpi-card revenue">
+        <div class="kpi-icon revenue"><i class="fas fa-money-bill-wave"></i></div>
+        <div class="kpi-value">৳{{ "{:,.0f}".format(stats.total_revenue) }}</div>
+        <div class="kpi-label">মোট আয় | Total Revenue</div>
+    </div>
+    <div class="kpi-card bookings-kpi">
+        <div class="kpi-icon bookings-icon"><i class="fas fa-ticket-alt"></i></div>
+        <div class="kpi-value">{{ stats.total_bookings }}</div>
+        <div class="kpi-label">মোট বুকিং | Total Bookings</div>
+    </div>
+    <div class="kpi-card trains-kpi">
+        <div class="kpi-icon trains-icon"><i class="fas fa-train"></i></div>
+        <div class="kpi-value">{{ stats.active_trains }}</div>
+        <div class="kpi-label">সক্রিয় ট্রেন | Active Trains</div>
+    </div>
+    <div class="kpi-card users-kpi">
+        <div class="kpi-icon users-icon"><i class="fas fa-users"></i></div>
+        <div class="kpi-value">{{ stats.total_users }}</div>
+        <div class="kpi-label">নিবন্ধিত ব্যবহারকারী | Registered Users</div>
+    </div>
+</div>
+
+<!-- Second row KPIs -->
+<div class="dashboard-grid" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="kpi-card" style="border-left: 4px solid var(--success);">
+        <div class="kpi-value" style="color: var(--success);">{{ stats.confirmed_bookings }}</div>
+        <div class="kpi-label">নিশ্চিত বুকিং | Confirmed</div>
+    </div>
+    <div class="kpi-card" style="border-left: 4px solid var(--danger);">
+        <div class="kpi-value" style="color: var(--danger);">{{ stats.cancelled_bookings }}</div>
+        <div class="kpi-label">বাতিল বুকিং | Cancelled</div>
+    </div>
+    <div class="kpi-card" style="border-left: 4px solid var(--info);">
+        <div class="kpi-value" style="color: var(--info);">{{ stats.total_stations }}</div>
+        <div class="kpi-label">মোট স্টেশন | Total Stations</div>
+    </div>
+</div>
+
+<!-- Payment Methods Breakdown -->
+{% if payment_methods %}
+<div class="dashboard-section">
+    <h3><i class="fas fa-chart-pie"></i> পেমেন্ট পদ্ধতি বিশ্লেষণ | Payment Methods</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        {% for pm in payment_methods %}
+        <div style="background: var(--bg-muted); padding: 18px; border-radius: var(--radius); text-align: center;">
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+                <i class="fas fa-{% if 'Card' in pm.Method %}credit-card{% elif pm.Method in ['bKash','Nagad','Rocket'] %}mobile-alt{% else %}money-bill{% endif %}"></i>
+                {{ pm.Method }}
+            </div>
+            <div style="font-size: 1.3rem; font-weight: 800; color: var(--primary);">{{ pm.count }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-light);">৳{{ "%.0f"|format(pm.total or 0) }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Admin Actions -->
+<div class="dashboard-section">
+    <h3><i class="fas fa-cogs"></i> দ্রুত কার্যক্রম | Quick Actions</h3>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="/bookings" class="btn btn-primary">
+            <i class="fas fa-list"></i> সব বুকিং | All Bookings
+        </a>
+        <a href="/stations" class="btn btn-outline" style="color: var(--primary); border-color: var(--primary);">
+            <i class="fas fa-map-marker-alt"></i> স্টেশন | Stations
+        </a>
+        <a href="/" class="btn btn-outline" style="color: var(--primary); border-color: var(--primary);">
+            <i class="fas fa-train"></i> ট্রেন সময়সূচী | Schedules
+        </a>
+    </div>
+</div>
+
+<!-- Recent Bookings Table -->
+<div class="dashboard-section">
+    <h3><i class="fas fa-history"></i> সাম্প্রতিক বুকিং | Recent Bookings</h3>
+
+    {% if recent_bookings %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>টিকেট নং</th>
+                    <th>PNR</th>
+                    <th>যাত্রীর নাম</th>
+                    <th>ট্রেন</th>
+                    <th>রুট</th>
+                    <th>তারিখ</th>
+                    <th>পরিমাণ</th>
+                    <th>পদ্ধতি</th>
+                    <th>স্ট্যাটাস</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in recent_bookings %}
+                <tr>
+                    <td><strong>#{{ booking.TicketID }}</strong></td>
+                    <td style="font-size: 0.75rem; color: var(--text-muted);">{{ booking.pnr_number or '—' }}</td>
+                    <td>{{ booking.FullName }}</td>
+                    <td>{{ booking.TrainName }}</td>
+                    <td style="font-size: 0.85rem;">{{ booking.SourceStation }} → {{ booking.DestinationStation }}</td>
+                    <td style="font-size: 0.85rem;">{{ booking.BookingDate.strftime('%d %b %Y') if booking.BookingDate else '' }}</td>
+                    <td><strong>৳{{ "%.0f"|format(booking.Amount or 0) }}</strong></td>
+                    <td style="font-size: 0.8rem;">{{ booking.Method or '—' }}</td>
+                    <td>
+                        <span class="status-badge {{ booking.SeatStatus|lower }}">
+                            {{ booking.SeatStatus }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding: 40px;">
+        <i class="fas fa-inbox" style="font-size: 40px;"></i>
+        <h3>কোন বুকিং নেই</h3>
+        <p>No bookings recorded yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

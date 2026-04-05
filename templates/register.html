@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}নিবন্ধন | Bangladesh Railway{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: linear-gradient(135deg, #f0f2f5 0%, #e8ecf1 100%); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <div class="card-header-green">
+        <h2 style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+            <i class="fas fa-user-plus"></i>
+            নতুন অ্যাকাউন্ট
+        </h2>
+        <p>Create your account to manage bookings easily</p>
+    </div>
+    <div class="card-body" style="padding: 35px 30px;">
+        <!-- Registration Form -->
+        <form method="POST" id="registerForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-user"></i> পূর্ণ নাম | Full Name
+                    <span class="required-star">*</span>
+                </label>
+                <input type="text" name="fullname" required
+                       placeholder="আপনার পূর্ণ নাম লিখুন | Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-at"></i> ইমেইল | Email Address
+                </label>
+                <input type="email" name="email"
+                       placeholder="youremail@example.com">
+                <div class="form-text">
+                    <i class="fas fa-info-circle"></i>
+                    আপনার টিকেটের তথ্য এই ইমেইলে পাঠানো হবে
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-user-tag"></i> ইউজারনেম | Username
+                    <span class="required-star">*</span>
+                </label>
+                <input type="text" name="username" required
+                       placeholder="একটি ইউজারনেম দিন | Choose a username">
+                <div class="form-text">
+                    <i class="fas fa-info-circle"></i>
+                    ভবিষ্যতে লগইনের জন্য ব্যবহার করা হবে
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-lock"></i> পাসওয়ার্ড | Password
+                    <span class="required-star">*</span>
+                </label>
+                <input type="password" name="password" id="password" required
+                       placeholder="পাসওয়ার্ড তৈরি করুন | Create a password">
+                <div class="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <div class="strength-text" id="strengthText"></div>
+                </div>
+                <div class="form-text">
+                    <i class="fas fa-shield-alt"></i>
+                    পাসওয়ার্ডে কমপক্ষে ৬টি অক্ষর থাকতে হবে
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-check-circle"></i> পাসওয়ার্ড নিশ্চিত | Confirm Password
+                    <span class="required-star">*</span>
+                </label>
+                <input type="password" name="confirm_password" id="confirmPassword" required
+                       placeholder="পাসওয়ার্ড পুনরায় লিখুন | Re-enter password">
+                <div class="form-text" id="passwordMatchMsg"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="submitBtn" style="margin-bottom: 15px;">
+                <i class="fas fa-user-check"></i> নিবন্ধন করুন | Register Now
+            </button>
+
+            <a href="/" class="btn btn-outline btn-block">
+                <i class="fas fa-arrow-left"></i> হোমে ফিরুন | Back to Home
+            </a>
+        </form>
+
+        <div class="divider">
+            <span>অথবা | Or</span>
+        </div>
+
+        <div class="guest-link">
+            <a href="/login">
+                <i class="fas fa-sign-in-alt"></i>
+                ইতিমধ্যে অ্যাকাউন্ট আছে? লগইন করুন | Already have an account? Login
+            </a>
+        </div>
+        <div class="guest-link" style="margin-top: 10px;">
+            <a href="/">
+                <i class="fas fa-user-friends"></i>
+                অতিথি হিসাবে টিকেট বুক করুন | Book as Guest
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirmPassword');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    const passwordMatchMsg = document.getElementById('passwordMatchMsg');
+
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        let message = '', color = '';
+
+        if (password.length >= 6) strength += 1;
+        if (password.length >= 8) strength += 1;
+        if (/[A-Z]/.test(password)) strength += 1;
+        if (/[0-9]/.test(password)) strength += 1;
+        if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+
+        switch(strength) {
+            case 0: case 1: message = 'দুর্বল | Weak'; color = '#e74c3c'; break;
+            case 2: message = 'মাঝারি | Fair'; color = '#f39c12'; break;
+            case 3: message = 'ভালো | Good'; color = '#3498db'; break;
+            case 4: case 5: message = 'শক্তিশালী | Strong'; color = '#27ae60'; break;
+        }
+
+        if (password.length === 0) {
+            message = ''; color = '#e5e7eb';
+            strengthFill.style.width = '0%';
+        } else {
+            strengthFill.style.width = (strength * 20) + '%';
+        }
+
+        strengthFill.style.backgroundColor = color;
+        strengthText.textContent = message;
+        strengthText.style.color = color;
+    }
+
+    function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const confirm = confirmInput.value;
+
+        if (confirm.length === 0) {
+            passwordMatchMsg.innerHTML = '<i class="fas fa-info-circle"></i> পাসওয়ার্ড নিশ্চিত করুন';
+            passwordMatchMsg.style.color = '#888';
+            return false;
+        }
+
+        if (password === confirm) {
+            passwordMatchMsg.innerHTML = '<i class="fas fa-check-circle" style="color: #27ae60;"></i> পাসওয়ার্ড মিলেছে | Match';
+            passwordMatchMsg.style.color = '#27ae60';
+            return true;
+        } else {
+            passwordMatchMsg.innerHTML = '<i class="fas fa-times-circle" style="color: #e74c3c;"></i> পাসওয়ার্ড মেলেনি | No match';
+            passwordMatchMsg.style.color = '#e74c3c';
+            return false;
+        }
+    }
+
+    passwordInput.addEventListener('input', function() {
+        checkPasswordStrength(this.value);
+        checkPasswordMatch();
+    });
+    confirmInput.addEventListener('input', checkPasswordMatch);
+
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        if (passwordInput.value.length < 6) {
+            alert('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে');
+            e.preventDefault();
+        } else if (passwordInput.value !== confirmInput.value) {
+            alert('পাসওয়ার্ড মেলেনি | Passwords do not match');
+            e.preventDefault();
+        }
+    });
+</script>
+{% endblock %}

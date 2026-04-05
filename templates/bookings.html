@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}আমার টিকেট | Bangladesh Railway{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-ticket-alt"></i> আমার টিকেট</h2>
+    <p>My Bookings | আপনার বুক করা টিকেটের তালিকা</p>
+</div>
+
+{% if bookings %}
+<div class="bookings-grid">
+    {% for booking in bookings %}
+    <div class="ticket-card">
+        <div class="ticket-status status-{{ booking.SeatStatus|lower }}">
+            <i class="fas fa-{{ 'check-circle' if booking.SeatStatus == 'Confirmed' else 'times-circle' }}"></i>
+            {{ booking.SeatStatus }}
+        </div>
+        <div class="ticket-header">
+            <div class="ticket-id">
+                <i class="fas fa-qrcode"></i> টিকেট নং: {{ booking.TicketID }}
+                {% if booking.pnr_number %}
+                <br><small style="opacity: 0.8;">PNR: {{ booking.pnr_number }}</small>
+                {% endif %}
+            </div>
+        </div>
+        <div class="ticket-body">
+            <div class="passenger-info">
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-user"></i> যাত্রীর নাম:</span>
+                    <span class="info-value">{{ booking.FullName }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-subway"></i> ট্রেন:</span>
+                    <span class="info-value">{{ booking.TrainName }}</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div class="route" style="justify-content: space-between; display: flex; align-items: center; margin: 15px 0;">
+                    <div class="station">
+                        <div class="station-name">{{ booking.SourceStation }}</div>
+                    </div>
+                    <div class="route-line">
+                        <hr>
+                        <i class="fas fa-train"></i>
+                    </div>
+                    <div class="station">
+                        <div class="station-name">{{ booking.DestinationStation }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="price-breakdown">
+                <div class="price-row">
+                    <span><i class="fas fa-calendar"></i> বুকিং তারিখ:</span>
+                    <span>{{ booking.BookingDate }}</span>
+                </div>
+                <div class="price-row">
+                    <span><i class="fas fa-credit-card"></i> পেমেন্ট পদ্ধতি:</span>
+                    <span>{{ booking.Method }}</span>
+                </div>
+                {% if booking.payment_status %}
+                <div class="price-row">
+                    <span><i class="fas fa-info-circle"></i> পেমেন্ট স্ট্যাটাস:</span>
+                    <span class="status-badge {{ booking.payment_status|lower }}">{{ booking.payment_status }}</span>
+                </div>
+                {% endif %}
+                <div class="price-row total-price">
+                    <span><i class="fas fa-money-bill-wave"></i> মোট ভাড়া:</span>
+                    <span>৳{{ "%.2f"|format(booking.Amount) }}</span>
+                </div>
+            </div>
+
+            <div class="ticket-actions">
+                {% if booking.SeatStatus == 'Confirmed' %}
+                    {% if booking.payment_status == 'Pending' %}
+                        <a href="/payment/{{ booking.TicketID }}" class="btn btn-accent btn-sm">
+                            <i class="fas fa-credit-card"></i> পেমেন্ট করুন | Pay Now
+                        </a>
+                    {% else %}
+                        <a href="/ticket/{{ booking.TicketID }}/download" class="btn btn-primary btn-sm">
+                            <i class="fas fa-download"></i> PDF ডাউনলোড
+                        </a>
+                    {% endif %}
+                    <a href="/cancel/{{ booking.TicketID }}" class="btn btn-danger btn-sm"
+                       onclick="return confirm('আপনি কি এই টিকেট বাতিল করতে চান? ৯০% টাকা ফেরত দেওয়া হবে।\n\nDo you want to cancel? 90% refund will be processed.')">
+                        <i class="fas fa-trash-alt"></i> বাতিল
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-ticket-alt"></i>
+    <h3>কোন টিকেট পাওয়া যায়নি</h3>
+    <p>No bookings found. আপনি এখনো কোনো টিকেট বুক করেননি।</p>
+    <a href="/" class="btn btn-primary">
+        <i class="fas fa-train"></i> ট্রেন খুঁজুন | Browse Trains
+    </a>
+</div>
+{% endif %}
+{% endblock %}

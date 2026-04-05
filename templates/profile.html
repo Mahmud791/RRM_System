@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}আমার প্রোফাইল | My Profile{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 40px auto; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 30px;">
+    <div class="card-header" style="text-align: center; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; margin-bottom: 30px;">
+        <h2 style="color: var(--primary-color); display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0;">
+            <i class="fas fa-user-circle" style="font-size: 1.5em;"></i> 
+            আমার প্রোফাইল | My Profile
+        </h2>
+        <p style="color: var(--text-light); margin-top: 10px;">{{ user.Role }} Account ({{ user.Username }})</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('profile') }}" style="display: grid; gap: 25px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <!-- User Basic Info -->
+            <div style="background: var(--bg-light); padding: 20px; border-radius: 8px;">
+                <h4 style="margin-top: 0; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">সাধারণ তথ্য | Basic Info</h4>
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="fullname" style="display: block; font-weight: 500; margin-bottom: 5px;">পুরো নাম | Full Name <span style="color: red;">*</span></label>
+                    <input type="text" id="fullname" name="fullname" class="form-control" value="{{ user.FullName }}" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="email" style="display: block; font-weight: 500; margin-bottom: 5px;">ইমেইল | Email</label>
+                    <input type="email" id="email" name="email" class="form-control" value="{{ user.Email or '' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="phone" style="display: block; font-weight: 500; margin-bottom: 5px;">ফোন | Phone</label>
+                    <input type="text" id="phone" name="phone" class="form-control" value="{{ user.Phone or '' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;">
+                </div>
+            </div>
+
+            <!-- Passenger Specific Info -->
+            <div style="background: var(--bg-light); padding: 20px; border-radius: 8px;">
+                <h4 style="margin-top: 0; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">যাত্রীর তথ্য | Passenger Info</h4>
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="passport" style="display: block; font-weight: 500; margin-bottom: 5px;">পাসপোর্ট/এনআইডি | Passport/NID</label>
+                    <input type="text" id="passport" name="passport" class="form-control" value="{{ passenger.PassportNumber if passenger else '' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="dob" style="display: block; font-weight: 500; margin-bottom: 5px;">জন্ম তারিখ | Date of Birth</label>
+                    <input type="date" id="dob" name="dob" class="form-control" value="{{ passenger.DateOfBirth if passenger and passenger.DateOfBirth else '' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="gender" style="display: block; font-weight: 500; margin-bottom: 5px;">লিঙ্গ | Gender</label>
+                    <select id="gender" name="gender" class="form-control" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;">
+                        <option value="">-- নির্বাচন করুন / Select --</option>
+                        <option value="Male" {% if passenger and passenger.Gender == 'Male' %}selected{% endif %}>পুরুষ | Male</option>
+                        <option value="Female" {% if passenger and passenger.Gender == 'Female' %}selected{% endif %}>মহিলা | Female</option>
+                        <option value="Other" {% if passenger and passenger.Gender == 'Other' %}selected{% endif %}>অন্যান্য | Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="nationality" style="display: block; font-weight: 500; margin-bottom: 5px;">জাতীয়তা | Nationality</label>
+                    <input type="text" id="nationality" name="nationality" class="form-control" value="{{ passenger.Nationality if passenger else 'Bangladeshi' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;">
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px;">
+            <button type="submit" class="btn btn-primary" style="padding: 12px 30px; font-size: 1.1em; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-save"></i> সংরক্ষণ করুন | Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

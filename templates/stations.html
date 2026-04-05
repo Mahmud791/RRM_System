@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}স্টেশন সমূহ | Bangladesh Railway{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-map-marked-alt"></i> স্টেশন সমূহ</h2>
+    <p>All Stations | বাংলাদেশ রেলওয়ের সকল স্টেশনের তালিকা</p>
+</div>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+    <div class="stat-chip">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Total Stations</span>
+        <span class="count">{{ stations|length }}</span>
+    </div>
+    <div class="stat-chip">
+        <i class="fas fa-project-diagram"></i>
+        <span>Junctions</span>
+        <span class="count">{{ stations|selectattr('is_junction')|list|length }}</span>
+    </div>
+</div>
+
+<!-- Group by Division -->
+{% set divisions = stations|map(attribute='division')|unique|list %}
+{% for division in divisions %}
+<div class="division-group">
+    <div class="division-header">
+        <i class="fas fa-map-pin"></i>
+        {{ division }} বিভাগ | {{ division }} Division
+    </div>
+    <div class="stations-grid">
+        {% for station in stations if station.division == division %}
+        <div class="station-card">
+            <div class="station-name">{{ station.station_name }}</div>
+            <div class="station-name-bn">{{ station.station_name_bn or '' }}</div>
+            <div class="station-meta">
+                <span class="meta-tag meta-code">
+                    <i class="fas fa-hashtag"></i> {{ station.station_code }}
+                </span>
+                <span class="meta-tag meta-city">
+                    <i class="fas fa-city"></i> {{ station.city }}
+                </span>
+                {% if station.is_junction %}
+                <span class="meta-tag meta-junction">
+                    <i class="fas fa-project-diagram"></i> Junction
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

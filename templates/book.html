@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}বুক টিকেট | Bangladesh Railway{% endblock %}
+
+{% block content %}
+<!-- Booking Card -->
+<div class="card">
+    <div class="card-header-green">
+        <h2><i class="fas fa-ticket-alt"></i> টিকেট বুক করুন</h2>
+        <p>Book Your Ticket | যাত্রার তথ্য দিন</p>
+    </div>
+
+    <!-- Train Details -->
+    <div style="padding: 30px; background: var(--bg-muted); border-bottom: 1px solid var(--border);">
+        <h3 style="font-size: 1.3rem; color: var(--text); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-train"></i> যাত্রার বিবরণ | Journey Details
+        </h3>
+        <div class="details-grid">
+            <div class="detail-item">
+                <div class="detail-label"><i class="fas fa-subway"></i> ট্রেন | Train</div>
+                <div class="detail-value"><strong>{{ schedule.TrainName }}</strong> ({{ schedule.TrainNumber }})</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label"><i class="fas fa-route"></i> রুট | Route</div>
+                <div class="detail-value">{{ schedule.SourceStation }} → {{ schedule.DestinationStation }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label"><i class="fas fa-clock"></i> ছাড়ার সময় | Departure</div>
+                <div class="detail-value">{{ schedule.DepartureTime }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label"><i class="fas fa-clock"></i> পৌঁছানোর সময় | Arrival</div>
+                <div class="detail-value">{{ schedule.ArrivalTime }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label"><i class="fas fa-chair"></i> শ্রেণী | Class</div>
+                <div class="detail-value">{{ schedule.ClassType }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label"><i class="fas fa-money-bill-wave"></i> ভাড়া | Fare</div>
+                <div class="detail-value price-value">৳{{ "%.2f"|format(schedule.TotalAmount) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Form -->
+    <div style="padding: 30px;">
+        <h3 style="font-size: 1.3rem; color: var(--text); margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-user-circle"></i> যাত্রীর তথ্য | Passenger Details
+        </h3>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label><i class="fas fa-user"></i> পূর্ণ নাম | Full Name *</label>
+                    <input type="text" name="fullname" required placeholder="যাত্রীর পূর্ণ নাম লিখুন | Enter passenger's full name"
+                           {% if session.get('fullname') %}value="{{ session.get('fullname') }}"{% endif %}>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> জন্ম তারিখ | Date of Birth *</label>
+                    <input type="date" name="dob" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-venus-mars"></i> লিঙ্গ | Gender *</label>
+                    <select name="gender" required>
+                        <option value="">লিঙ্গ নির্বাচন করুন</option>
+                        <option value="Male">পুরুষ | Male</option>
+                        <option value="Female">মহিলা | Female</option>
+                        <option value="Other">অন্যান্য | Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label><i class="fas fa-passport"></i> পাসপোর্ট/এনআইডি নম্বর | Passport/NID Number *</label>
+                    <input type="text" name="passport" required placeholder="পাসপোর্ট বা এনআইডি নম্বর দিন">
+                </div>
+
+                <div class="form-group full-width">
+                    <label><i class="fas fa-credit-card"></i> পেমেন্ট পদ্ধতি | Payment Method *</label>
+                    <div class="payment-methods">
+                        <div class="payment-option">
+                            <input type="radio" name="payment_method" value="Credit Card" id="credit" required>
+                            <label for="credit" class="payment-label">
+                                <i class="fas fa-credit-card"></i> Credit Card
+                            </label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="payment_method" value="Debit Card" id="debit">
+                            <label for="debit" class="payment-label">
+                                <i class="fas fa-credit-card"></i> Debit Card
+                            </label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="payment_method" value="bKash" id="bkash">
+                            <label for="bkash" class="payment-label">
+                                <i class="fas fa-mobile-alt"></i> bKash
+                            </label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="payment_method" value="Nagad" id="nagad">
+                            <label for="nagad" class="payment-label">
+                                <i class="fas fa-mobile-alt"></i> Nagad
+                            </label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="payment_method" value="Rocket" id="rocket">
+                            <label for="rocket" class="payment-label">
+                                <i class="fas fa-mobile-alt"></i> Rocket
+                            </label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" name="payment_method" value="Cash" id="cash">
+                            <label for="cash" class="payment-label">
+                                <i class="fas fa-money-bill"></i> Cash
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-top: 30px; padding-top: 20px; border-top: 2px solid var(--border);">
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-check-circle"></i> টিকেট বুক করুন | Confirm Booking
+                </button>
+                <a href="/" class="btn btn-outline" style="flex: 0.5;">
+                    <i class="fas fa-arrow-left"></i> বাতিল | Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

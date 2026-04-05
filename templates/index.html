@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Bangladesh Railway | ট্রেন টিকেট বুকিং{% endblock %}
+
+{% block header_class %}hero{% endblock %}
+
+{% block hero %}
+<div class="hero-content">
+    <h2>সহজে, দ্রুত, নিরাপদে</h2>
+    <p>অনলাইনে ট্রেনের টিকেট বুক করুন | Book your train tickets online with ease</p>
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-number">100+</div>
+            <div class="stat-label">Daily Trains</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">50K+</div>
+            <div class="stat-label">Happy Passengers</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Customer Support</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Search Section -->
+<div class="search-section">
+    <div class="search-title">
+        <i class="fas fa-search" style="color: var(--primary);"></i>
+        <span>খুঁজুন আপনার ট্রেন | Find Your Train</span>
+    </div>
+    <div class="search-grid">
+        <div class="search-input">
+            <label><i class="fas fa-map-marker-alt"></i> থেকে | From</label>
+            <select id="fromStation">
+                <option value="">সব স্টেশন | All Stations</option>
+                {% set stations_from = [] %}
+                {% for schedule in schedules %}
+                    {% if schedule.SourceStation not in stations_from %}
+                        <option value="{{ schedule.SourceStation }}">{{ schedule.SourceStation }}</option>
+                        {% set _ = stations_from.append(schedule.SourceStation) %}
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="search-input">
+            <label><i class="fas fa-map-marker-alt"></i> গন্তব্য | To</label>
+            <select id="toStation">
+                <option value="">সব স্টেশন | All Stations</option>
+                {% set stations_to = [] %}
+                {% for schedule in schedules %}
+                    {% if schedule.DestinationStation not in stations_to %}
+                        <option value="{{ schedule.DestinationStation }}">{{ schedule.DestinationStation }}</option>
+                        {% set _ = stations_to.append(schedule.DestinationStation) %}
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <button class="search-btn" onclick="filterTrains()"><i class="fas fa-search"></i> খুঁজুন</button>
+    </div>
+</div>
+
+<!-- Trains Header -->
+<div class="trains-header">
+    <h3><i class="fas fa-clock"></i> উপলব্ধ ট্রেন | Available Trains</h3>
+    <div class="filter-buttons">
+        <button class="filter-btn active" onclick="filterByClass('all', this)">সব | All</button>
+        <button class="filter-btn" onclick="filterByClass('Sleeper', this)">স্লিপার | Sleeper</button>
+        <button class="filter-btn" onclick="filterByClass('AC', this)">এসি | AC</button>
+    </div>
+</div>
+
+<!-- Train Cards Grid -->
+<div class="trains-grid" id="trainsGrid">
+    {% for schedule in schedules %}
+    <div class="train-card" data-from="{{ schedule.SourceStation }}" data-to="{{ schedule.DestinationStation }}" data-class="{{ schedule.ClassType }}">
+        <div class="card-header">
+            <div class="train-info">
+                <h4>{{ schedule.TrainName }}</h4>
+                <div class="train-number">{{ schedule.TrainNumber }}</div>
+            </div>
+            <div class="class-badge">{{ schedule.ClassType }}</div>
+        </div>
+        <div class="card-body">
+            <div class="route">
+                <div class="station">
+                    <div class="station-name">{{ schedule.SourceStation }}</div>
+                    <div class="station-time">{{ schedule.DepartureTime.strftime('%I:%M %p') if schedule.DepartureTime else schedule.DepartureTime }}</div>
+                </div>
+                <div class="route-line">
+                    <hr>
+                    <i class="fas fa-train"></i>
+                </div>
+                <div class="station">
+                    <div class="station-name">{{ schedule.DestinationStation }}</div>
+                    <div class="station-time">{{ schedule.ArrivalTime.strftime('%I:%M %p') if schedule.ArrivalTime else schedule.ArrivalTime }}</div>
+                </div>
+            </div>
+            <div class="price-section">
+                <div>
+                    <span class="price">৳{{ "%.0f"|format(schedule.TotalAmount) }}</span>
+                    <small>/person</small>
+                </div>
+                <div class="seats">
+                    {% if schedule.AvailableSeats > 20 %}
+                        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                        <span class="seats-available">{{ schedule.AvailableSeats }} seats</span>
+                    {% elif schedule.AvailableSeats > 0 %}
+                        <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
+                        <span class="seats-low">Only {{ schedule.AvailableSeats }} left!</span>
+                    {% else %}
+                        <i class="fas fa-times-circle" style="color: var(--danger);"></i>
+                        <span class="seats-full">Fully Booked</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            {% if schedule.AvailableSeats > 0 %}
+                <a href="/book/{{ schedule.ScheduleID }}" class="book-btn">
+                    <i class="fas fa-ticket-alt"></i> এখনই বুক করুন | Book Now
+                </a>
+            {% else %}
+                <button class="book-btn disabled" disabled>
+                    <i class="fas fa-ban"></i> শেষ | Sold Out
+                </button>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if schedules|length == 0 %}
+<div class="empty-state">
+    <i class="fas fa-train"></i>
+    <h3>কোন ট্রেন পাওয়া যায়নি</h3>
+    <p>No trains available at the moment. Please check back later.</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Cache station data in sessionStorage
+    const CACHE_KEY = 'railway_stations_cache';
+    const CACHE_TTL = 3600000; // 1 hour
+
+    function getCachedData(key) {
+        try {
+            const cached = sessionStorage.getItem(key);
+            if (cached) {
+                const data = JSON.parse(cached);
+                if (Date.now() - data.timestamp < CACHE_TTL) {
+                    return data.value;
+                }
+                sessionStorage.removeItem(key);
+            }
+        } catch (e) {}
+        return null;
+    }
+
+    function setCachedData(key, value) {
+        try {
+            sessionStorage.setItem(key, JSON.stringify({
+                value: value,
+                timestamp: Date.now()
+            }));
+        } catch (e) {}
+    }
+
+    function filterTrains() {
+        const fromStation = document.getElementById('fromStation').value;
+        const toStation = document.getElementById('toStation').value;
+        const cards = document.querySelectorAll('.train-card');
+
+        cards.forEach(card => {
+            const cardFrom = card.getAttribute('data-from');
+            const cardTo = card.getAttribute('data-to');
+            let show = true;
+
+            if (fromStation && cardFrom !== fromStation) show = false;
+            if (toStation && cardTo !== toStation) show = false;
+
+            card.style.display = show ? 'block' : 'none';
+        });
+    }
+
+    function filterByClass(className, btn) {
+        const cards = document.querySelectorAll('.train-card');
+        const buttons = document.querySelectorAll('.filter-btn');
+
+        buttons.forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+
+        cards.forEach(card => {
+            const cardClass = card.getAttribute('data-class');
+            if (className === 'all' || cardClass === className ||
+                (className === 'AC' && (cardClass.includes('AC') || cardClass === 'Snigdha'))) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}
