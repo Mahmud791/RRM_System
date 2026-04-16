@@ -11,8 +11,9 @@ from flask import (
 )
 from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
-import mysql.connector
-from mysql.connector import Error
+# DB wrapper for Turso
+from database.db_wrapper import get_db_connection
+Error = Exception
 
 # Optional: PDF generation
 try:
@@ -28,54 +29,13 @@ except ImportError:
 # APP CONFIG
 # ============================================
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'railway_secret_key_prod_2026')
+app.secret_key = os.environ.get('SECRET_KEY',"0b85b93c2d511afa9469a02dd195d45d8dfa6305")
 app.config['WTF_CSRF_TIME_LIMIT'] = 3600
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)
 
 csrf = CSRFProtect(app)
 
-# --- DATABASE CONFIG ---
-db_config = {
-    'host': os.environ.get('DB_HOST', 'localhost'),
-    'user': os.environ.get('DB_USER', 'root'),
-    'password': os.environ.get('DB_PASSWORD', ''),
-    'database': os.environ.get('DB_NAME', 'railway_db'),
-    'charset': 'utf8mb4',
-    'collation': 'utf8mb4_unicode_ci',
-    'use_unicode': True,
-    'pool_name': 'railway_pool',
-    'pool_size': 5,
-}
 
-# Connection pool initialization
-_pool_initialized = False
-
-
-def get_db_connection():
-    """Get a connection from the pool with error handling"""
-    global _pool_initialized
-    try:
-        if not _pool_initialized:
-            # First call creates the pool
-            conn = mysql.connector.connect(**db_config)
-            _pool_initialized = True
-            return conn
-        else:
-            conn = mysql.connector.connect(
-                pool_name='railway_pool',
-                pool_size=5,
-            )
-            return conn
-    except Exception:
-        # Fallback: direct connection without pool
-        try:
-            config = {k: v for k, v in db_config.items()
-                      if k not in ('pool_name', 'pool_size')}
-            conn = mysql.connector.connect(**config)
-            return conn
-        except Error as e:
-            print(f"DB Connection Error: {e}")
-            return None
 
 
 # ============================================
@@ -513,7 +473,7 @@ def admin_dashboard():
         total_users = cursor.fetchone()['count']
 
         # Active trains
-        cursor.execute("SELECT COUNT(*) as count FROM trains WHERE is_active = TRUE")
+        cursor.execute("SELECT COUNT(*) as count FROM trains WHERE is_active = 1")
         active_trains = cursor.fetchone()['count']
 
         # Total stations
@@ -546,8 +506,21 @@ def admin_dashboard():
         """)
         payment_methods = cursor.fetchall()
 
+        # Daily Revenue (Last 7 Days)
+        cursor.execute("""
+            SELECT substr(PaymentDate, 1, 10) as date, SUM(Amount) as daily_revenue
+            FROM payments
+            WHERE payment_status = 'Completed' AND PaymentDate IS NOT NULL
+            GROUP BY substr(PaymentDate, 1, 10)
+            ORDER BY date DESC
+            LIMIT 7
+        """)
+        revenue_trend = cursor.fetchall()
+        # reverse to chronological order
+        revenue_trend.reverse()
+
         stats = {
-            'total_revenue': float(revenue),
+            'total_revenue': float(revenue_trend[0]['daily_revenue']) if not revenue and revenue_trend else float(revenue or 0),
             'total_bookings': total_bookings,
             'confirmed_bookings': confirmed_bookings,
             'cancelled_bookings': cancelled_bookings,
@@ -556,8 +529,25 @@ def admin_dashboard():
             'total_stations': total_stations,
         }
 
+        # Need simple arrays for frontend charts
+        chart_data = {
+            'revenue': {
+                'labels': [r['date'] for r in revenue_trend],
+                'data': [float(r['daily_revenue']) for r in revenue_trend]
+            },
+            'bookings': {
+                'labels': ['Confirmed', 'Cancelled'],
+                'data': [confirmed_bookings, cancelled_bookings]
+            },
+            'payments': {
+                'labels': [p['Method'] for p in payment_methods],
+                'data': [p['count'] for p in payment_methods]
+            }
+        }
+
         return render_template('admin_dashboard.html',
                              stats=stats,
+                             chart_data=chart_data,
                              recent_bookings=recent_bookings,
                              payment_methods=payment_methods)
     finally:

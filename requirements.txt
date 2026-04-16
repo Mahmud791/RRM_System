@@ -1,5 +1,5 @@
 flask
-mysql-connector-python
+libsql-client
 flask-wtf
 reportlab
 python-dotenv
