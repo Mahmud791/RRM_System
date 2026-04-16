@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Routes | Bangladesh Railway Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-route"></i> Manage Routes</h2>
+    <p>Add, edit, or manage train routes</p>
+</div>
+
+<!-- Add New Route -->
+<div class="dashboard-section">
+    <h3><i class="fas fa-plus-circle"></i> Add New Route</h3>
+    <form method="POST" action="/admin/routes/add" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; max-width: 900px;">
+        <div class="form-group">
+            <label>Source Station</label>
+            <select name="source_station" required>
+                <option value="">Select Source</option>
+                {% for station in stations %}
+                <option value="{{ station.station_name }}">{{ station.station_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Destination Station</label>
+            <select name="destination_station" required>
+                <option value="">Select Destination</option>
+                {% for station in stations %}
+                <option value="{{ station.station_name }}">{{ station.station_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Distance (km)</label>
+            <input type="number" name="distance" placeholder="e.g., 100" min="1">
+        </div>
+        <div class="form-group">
+            <label>Duration (minutes)</label>
+            <input type="number" name="duration" placeholder="e.g., 120" min="1">
+        </div>
+        <div class="form-group" style="display: flex; align-items: flex-end;">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Route
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Routes List -->
+<div class="dashboard-section">
+    <h3><i class="fas fa-list"></i> All Routes</h3>
+    
+    {% if routes %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Route ID</th>
+                    <th>Source Station</th>
+                    <th>Destination Station</th>
+                    <th>Distance (km)</th>
+                    <th>Duration (min)</th>
+                    <th>Schedules</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for route in routes %}
+                <tr>
+                    <td><strong>{{ route.RouteID }}</strong></td>
+                    <td>{{ route.SourceStation }}</td>
+                    <td>{{ route.DestinationStation }}</td>
+                    <td>{{ route.Distance or '—' }}</td>
+                    <td>{{ route.estimated_duration_minutes or '—' }}</td>
+                    <td>{{ route.schedule_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-route" style="font-size: 40px;"></i>
+        <h3>No routes found</h3>
+        <p>Add your first route using the form above.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Quick Links -->
+<div class="dashboard-section">
+    <h3>Quick Links</h3>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="/admin" class="btn btn-primary">
+            <i class="fas fa-shield-alt"></i> Dashboard
+        </a>
+        <a href="/admin/trains" class="btn btn-outline">
+            <i class="fas fa-train"></i> Trains
+        </a>
+        <a href="/admin/schedules" class="btn btn-outline">
+            <i class="fas fa-clock"></i> Schedules
+        </a>
+    </div>
+</div>
+{% endblock %}

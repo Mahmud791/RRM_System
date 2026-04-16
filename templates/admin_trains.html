@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Trains | Bangladesh Railway Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-train"></i> Manage Trains</h2>
+    <p>Add, edit, or manage train information</p>
+</div>
+
+<!-- Add New Train -->
+<div class="dashboard-section">
+    <h3><i class="fas fa-plus-circle"></i> Add New Train</h3>
+    <form method="POST" action="/admin/trains/add" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; max-width: 800px;">
+        <div class="form-group">
+            <label>Train Number</label>
+            <input type="text" name="train_number" placeholder="e.g., 701" required>
+        </div>
+        <div class="form-group">
+            <label>Train Name</label>
+            <input type="text" name="train_name" placeholder="e.g., Padma Express" required>
+        </div>
+        <div class="form-group">
+            <label>Total Seats</label>
+            <input type="number" name="total_seats" value="80" min="10" max="500">
+        </div>
+        <div class="form-group" style="display: flex; align-items: flex-end;">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Train
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Trains List -->
+<div class="dashboard-section">
+    <h3><i class="fas fa-list"></i> All Trains</h3>
+    
+    {% if trains %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Train Number</th>
+                    <th>Train Name</th>
+                    <th>Total Seats</th>
+                    <th>Schedules</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for train in trains %}
+                <tr>
+                    <td><strong>{{ train.TrainNumber }}</strong></td>
+                    <td>{{ train.TrainName }}</td>
+                    <td>{{ train.TotalSeats }}</td>
+                    <td>{{ train.schedule_count }}</td>
+                    <td>
+                        <span class="status-badge {{ 'confirmed' if train.is_active else 'cancelled' }}">
+                            {{ 'Active' if train.is_active else 'Inactive' }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="/admin/trains/{{ train.TrainNumber }}/toggle" class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem;">
+                            <i class="fas fa-toggle-{{ 'on' if train.is_active else 'off' }}"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-train" style="font-size: 40px;"></i>
+        <h3>No trains found</h3>
+        <p>Add your first train using the form above.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Quick Links -->
+<div class="dashboard-section">
+    <h3>Quick Links</h3>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="/admin" class="btn btn-primary">
+            <i class="fas fa-shield-alt"></i> Dashboard
+        </a>
+        <a href="/admin/routes" class="btn btn-outline">
+            <i class="fas fa-route"></i> Routes
+        </a>
+        <a href="/admin/schedules" class="btn btn-outline">
+            <i class="fas fa-clock"></i> Schedules
+        </a>
+    </div>
+</div>
+{% endblock %}

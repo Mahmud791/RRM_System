@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Cancellations & Refunds | Bangladesh Railway Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-undo"></i> Cancellations & Refunds</h2>
+    <p>View all cancellation and refund records</p>
+</div>
+
+<!-- Cancellations List -->
+<div class="dashboard-section">
+    <h3><i class="fas fa-history"></i> All Cancellations</h3>
+    
+    {% if cancellations %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Cancel ID</th>
+                    <th>Ticket ID</th>
+                    <th>PNR</th>
+                    <th>Passenger</th>
+                    <th>Cancellation Date</th>
+                    <th>Reason</th>
+                    <th>Refund Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cancel in cancellations %}
+                <tr>
+                    <td><strong>{{ cancel.CancellationID }}</strong></td>
+                    <td>#{{ cancel.TicketID }}</td>
+                    <td style="font-size: 0.75rem; color: var(--text-muted);">{{ cancel.pnr_number or '—' }}</td>
+                    <td>{{ cancel.FullName }}</td>
+                    <td style="font-size: 0.85rem;">{{ cancel.CancellationDate.strftime('%d %b %Y') if cancel.CancellationDate else '—' }}</td>
+                    <td>{{ cancel.Reason or '—' }}</td>
+                    <td><strong>৳{{ "%.2f"|format(cancel.RefundAmount or 0) }}</strong></td>
+                    <td>
+                        <span class="status-badge {{ cancel.Status|lower }}">
+                            {{ cancel.Status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Summary -->
+    {% set total_refund = namespace(value=0) %}
+    {% for cancel in cancellations %}
+        {% set total_refund.value = total_refund.value + (cancel.RefundAmount or 0) %}
+    {% endfor %}
+    
+    <div style="margin-top: 20px; padding: 15px; background: var(--bg-muted); border-radius: var(--radius);">
+        <strong>Total Refunds: ৳{{ "%.2f"|format(total_refund.value) }}</strong>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-undo" style="font-size: 40px;"></i>
+        <h3>No cancellations</h3>
+        <p>No tickets have been cancelled yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Quick Links -->
+<div class="dashboard-section">
+    <h3>Quick Links</h3>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="/admin" class="btn btn-primary">
+            <i class="fas fa-shield-alt"></i> Dashboard
+        </a>
+        <a href="/admin/search" class="btn btn-outline">
+            <i class="fas fa-search"></i> Search
+        </a>
+        <a href="/admin/reports" class="btn btn-outline">
+            <i class="fas fa-chart-bar"></i> Reports
+        </a>
+    </div>
+</div>
+{% endblock %}

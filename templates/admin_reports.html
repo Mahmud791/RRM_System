@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Analytics | Bangladesh Railway Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-chart-bar"></i> Reports & Analytics</h2>
+    <p>View detailed analytics and reports</p>
+</div>
+
+<!-- Popular Routes -->
+<div class="dashboard-section">
+    <h3><i class="fas fa-route"></i> Most Popular Routes</h3>
+    
+    {% if popular_routes %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Route</th>
+                    <th>Total Bookings</th>
+                    <th>Total Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for route in popular_routes %}
+                <tr>
+                    <td><strong>{{ route.SourceStation }}</strong> → <strong>{{ route.DestinationStation }}</strong></td>
+                    <td>{{ route.booking_count }}</td>
+                    <td>৳{{ "%.0f"|format(route.total_revenue or 0) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted);">No route data available.</p>
+    {% endif %}
+</div>
+
+<!-- Train Performance -->
+<div class="dashboard-section">
+    <h3><i class="fas fa-train"></i> Train Performance</h3>
+    
+    {% if train_performance %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Train</th>
+                    <th>Total Seats</th>
+                    <th>Total Bookings</th>
+                    <th>Confirmed</th>
+                    <th>Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for train in train_performance %}
+                <tr>
+                    <td>
+                        <strong>{{ train.TrainNumber }}</strong><br>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">{{ train.TrainName }}</span>
+                    </td>
+                    <td>{{ train.TotalSeats }}</td>
+                    <td>{{ train.total_bookings or 0 }}</td>
+                    <td>{{ train.confirmed or 0 }}</td>
+                    <td>৳{{ "%.0f"|format(train.revenue or 0) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted);">No train data available.</p>
+    {% endif %}
+</div>
+
+<!-- User Registration -->
+<div class="dashboard-section">
+    <h3><i class="fas fa-user-plus"></i> User Registration Trend</h3>
+    
+    {% if user_registration %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>New Users</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reg in user_registration %}
+                <tr>
+                    <td>{{ reg.reg_date }}</td>
+                    <td>{{ reg.new_users }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted);">No user registration data available.</p>
+    {% endif %}
+</div>
+
+<!-- Quick Links -->
+<div class="dashboard-section">
+    <h3>Quick Links</h3>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="/admin" class="btn btn-primary">
+            <i class="fas fa-shield-alt"></i> Dashboard
+        </a>
+        <a href="/admin/search" class="btn btn-outline">
+            <i class="fas fa-search"></i> Search
+        </a>
+        <a href="/admin/cancellations" class="btn btn-outline">
+            <i class="fas fa-undo"></i> Cancellations
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Search | Bangladesh Railway Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-search"></i> Search</h2>
+    <p>Search bookings, passengers, and users</p>
+</div>
+
+<!-- Search Form -->
+<div class="dashboard-section">
+    <form method="POST" class="search-form" style="display: flex; gap: 10px; max-width: 600px;">
+        <input type="text" name="search" placeholder="Search by PNR, name, passport, or username..." 
+               value="{{ search_term }}" required
+               style="flex: 1; padding: 12px 15px; border-radius: var(--radius); border: 1px solid var(--border);">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i> Search
+        </button>
+    </form>
+</div>
+
+<!-- Results -->
+{% if search_term %}
+<div class="dashboard-section">
+    <h3><i class="fas fa-ticket-alt"></i> Bookings</h3>
+    
+    {% if results.bookings %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ticket ID</th>
+                    <th>PNR</th>
+                    <th>Passenger</th>
+                    <th>Train</th>
+                    <th>Route</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in results.bookings %}
+                <tr>
+                    <td><strong>#{{ booking.TicketID }}</strong></td>
+                    <td style="font-size: 0.75rem; color: var(--text-muted);">{{ booking.pnr_number or '—' }}</td>
+                    <td>{{ booking.FullName }}</td>
+                    <td>{{ booking.TrainName }}</td>
+                    <td style="font-size: 0.85rem;">{{ booking.SourceStation }} → {{ booking.DestinationStation }}</td>
+                    <td><strong>৳{{ "%.0f"|format(booking.Amount or 0) }}</strong></td>
+                    <td>
+                        <span class="status-badge {{ booking.SeatStatus|lower }}">
+                            {{ booking.SeatStatus }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted);">No bookings found.</p>
+    {% endif %}
+</div>
+
+<div class="dashboard-section">
+    <h3><i class="fas fa-user"></i> Passengers</h3>
+    
+    {% if results.passengers %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Passport/NID</th>
+                    <th>Gender</th>
+                    <th>Username</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for passenger in results.passengers %}
+                <tr>
+                    <td><strong>{{ passenger.PassengerID }}</strong></td>
+                    <td>{{ passenger.FullName }}</td>
+                    <td style="font-size: 0.85rem;">{{ passenger.PassportNumber or '—' }}</td>
+                    <td>{{ passenger.Gender or '—' }}</td>
+                    <td>{{ passenger.Username }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted);">No passengers found.</p>
+    {% endif %}
+</div>
+
+<div class="dashboard-section">
+    <h3><i class="fas fa-users"></i> Users</h3>
+    
+    {% if results.users %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in results.users %}
+                <tr>
+                    <td><strong>{{ user.UserID }}</strong></td>
+                    <td>{{ user.Username }}</td>
+                    <td>{{ user.FullName }}</td>
+                    <td style="font-size: 0.85rem;">{{ user.Email or '—' }}</td>
+                    <td>
+                        <span class="status-badge {{ 'confirmed' if user.Role == 'Admin' else 'pending' }}">
+                            {{ user.Role }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted);">No users found.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Quick Links -->
+<div class="dashboard-section">
+    <h3>Quick Links</h3>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="/admin" class="btn btn-primary">
+            <i class="fas fa-shield-alt"></i> Dashboard
+        </a>
+        <a href="/admin/cancellations" class="btn btn-outline">
+            <i class="fas fa-undo"></i> Cancellations
+        </a>
+        <a href="/admin/reports" class="btn btn-outline">
+            <i class="fas fa-chart-bar"></i> Reports
+        </a>
+    </div>
+</div>
+{% endblock %}
