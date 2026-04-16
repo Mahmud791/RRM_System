@@ -34,7 +34,7 @@
                     <td>#{{ cancel.TicketID }}</td>
                     <td style="font-size: 0.75rem; color: var(--text-muted);">{{ cancel.pnr_number or '—' }}</td>
                     <td>{{ cancel.FullName }}</td>
-                    <td style="font-size: 0.85rem;">{{ cancel.CancellationDate.strftime('%d %b %Y') if cancel.CancellationDate else '—' }}</td>
+                    <td style="font-size: 0.85rem;">{{ cancel.CancellationDate }}</td>
                     <td>{{ cancel.Reason or '—' }}</td>
                     <td><strong>৳{{ "%.2f"|format(cancel.RefundAmount or 0) }}</strong></td>
                     <td>

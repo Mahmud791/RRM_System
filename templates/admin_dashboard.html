@@ -188,7 +188,7 @@
                     <td>{{ booking.FullName }}</td>
                     <td>{{ booking.TrainName }}</td>
                     <td style="font-size: 0.85rem;">{{ booking.SourceStation }} → {{ booking.DestinationStation }}</td>
-                    <td style="font-size: 0.85rem;">{{ booking.BookingDate.strftime('%d %b %Y') if booking.BookingDate else '' }}</td>
+                    <td style="font-size: 0.85rem;">{{ booking.BookingDate }}</td>
                     <td><strong>৳{{ "%.0f"|format(booking.Amount or 0) }}</strong></td>
                     <td style="font-size: 0.8rem;">{{ booking.Method or '—' }}</td>
                     <td>

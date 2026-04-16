@@ -88,7 +88,7 @@
             <div class="route">
                 <div class="station">
                     <div class="station-name">{{ schedule.SourceStation }}</div>
-                    <div class="station-time">{{ schedule.DepartureTime.strftime('%I:%M %p') if schedule.DepartureTime else schedule.DepartureTime }}</div>
+                    <div class="station-time">{{ schedule.DepartureTime }}</div>
                 </div>
                 <div class="route-line">
                     <hr>
@@ -96,7 +96,7 @@
                 </div>
                 <div class="station">
                     <div class="station-name">{{ schedule.DestinationStation }}</div>
-                    <div class="station-time">{{ schedule.ArrivalTime.strftime('%I:%M %p') if schedule.ArrivalTime else schedule.ArrivalTime }}</div>
+                    <div class="station-time">{{ schedule.ArrivalTime }}</div>
                 </div>
             </div>
             <div class="price-section">

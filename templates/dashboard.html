@@ -74,7 +74,7 @@
                     <td style="font-size: 0.8rem; color: var(--text-muted);">{{ booking.pnr_number or 'N/A' }}</td>
                     <td>{{ booking.TrainName }}</td>
                     <td>{{ booking.SourceStation }} → {{ booking.DestinationStation }}</td>
-                    <td>{{ booking.BookingDate.strftime('%d %b %Y') if booking.BookingDate else '' }}</td>
+                    <td>{{ booking.BookingDate }}</td>
                     <td><strong>৳{{ "%.0f"|format(booking.Amount or 0) }}</strong></td>
                     <td>
                         <span class="status-badge {{ booking.SeatStatus|lower }}">
