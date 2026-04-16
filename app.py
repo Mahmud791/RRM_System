@@ -459,38 +459,77 @@ def dashboard():
         return "Database Connection Failed", 500
 
     cursor = conn.cursor(dictionary=True, buffered=True)
+    bookings = []
+    stats = {
+        "total_bookings": 0,
+        "confirmed": 0,
+        "cancelled": 0,
+        "total_spent": 0,
+    }
 
     try:
-        user_id = session["user_id"]
+        user_id = session.get("user_id")
+        if not user_id:
+            return redirect(url_for("login"))
 
-        # Get user's bookings
+        # Get user's bookings - use subquery to find passenger IDs for this user
         cursor.execute(
             """
+            SELECT p.PassengerID 
+            FROM passengers p 
+            WHERE p.UserID = %s
+            """,
+            (user_id,),
+        )
+        passenger_ids = [row["PassengerID"] for row in cursor.fetchall()]
+
+        if not passenger_ids:
+            passenger_ids = [0]
+
+        # Get bookings for these passengers
+        placeholders = ",".join(["%s"] * len(passenger_ids))
+        cursor.execute(
+            f"""
             SELECT b.TicketID, b.BookingDate, b.SeatStatus, b.pnr_number,
-                   p.FullName, t.TrainName, t.TrainNumber,
-                   r.SourceStation, r.DestinationStation,
+                   COALESCE(p.FullName, '') as FullName, 
+                   COALESCE(t.TrainName, '') as TrainName, 
+                   COALESCE(t.TrainNumber, '') as TrainNumber,
+                   COALESCE(r.SourceStation, '') as SourceStation, 
+                   COALESCE(r.DestinationStation, '') as DestinationStation,
                    s.DepartureTime, s.ArrivalTime,
                    pay.Amount, pay.Method, pay.payment_status
             FROM bookings b
-            JOIN passengers p ON b.PassengerID = p.PassengerID
-            JOIN schedules s ON b.ScheduleID = s.ScheduleID
-            JOIN trains t ON s.TrainNumber = t.TrainNumber
-            JOIN routes r ON s.RouteID = r.RouteID
+            LEFT JOIN passengers p ON b.PassengerID = p.PassengerID
+            LEFT JOIN schedules s ON b.ScheduleID = s.ScheduleID
+            LEFT JOIN trains t ON s.TrainNumber = t.TrainNumber
+            LEFT JOIN routes r ON s.RouteID = r.RouteID
             LEFT JOIN payments pay ON b.TicketID = pay.TicketID
-            WHERE p.UserID = %s
+            WHERE b.PassengerID IN ({placeholders})
             ORDER BY b.TicketID DESC
-        """,
-            (user_id,),
+            LIMIT 100
+            """,
+            tuple(passenger_ids),
         )
         bookings = cursor.fetchall()
 
         # Stats
         total_bookings = len(bookings)
-        confirmed = sum(1 for b in bookings if b["SeatStatus"] == "Confirmed")
-        cancelled = sum(1 for b in bookings if b["SeatStatus"] == "Cancelled")
-        total_spent = sum(
-            float(b["Amount"] or 0) for b in bookings if b["SeatStatus"] == "Confirmed"
-        )
+        confirmed = 0
+        cancelled = 0
+        total_spent = 0
+
+        for b in bookings:
+            try:
+                seat_status = str(b.get("SeatStatus", ""))
+                if seat_status == "Confirmed":
+                    confirmed += 1
+                elif seat_status == "Cancelled":
+                    cancelled += 1
+                amount = b.get("Amount")
+                if amount and seat_status == "Confirmed":
+                    total_spent += float(amount)
+            except:
+                pass
 
         stats = {
             "total_bookings": total_bookings,
@@ -500,6 +539,9 @@ def dashboard():
         }
 
         return render_template("dashboard.html", bookings=bookings, stats=stats)
+    except Exception as e:
+        print(f"Dashboard error: {e}")
+        return f"Error loading dashboard: {str(e)}", 500
     finally:
         cursor.close()
         conn.close()
@@ -1577,41 +1619,64 @@ def view_bookings():
     cursor = conn.cursor(dictionary=True, buffered=True)
 
     try:
-        user_id = session["user_id"]
+        user_id = session.get("user_id")
         is_admin = session.get("role") == "Admin"
 
         if is_admin:
+            # Admin sees all bookings
             query = """
-                SELECT b.TicketID, b.pnr_number, p.FullName, t.TrainName,
-                       r.SourceStation, r.DestinationStation,
+                SELECT b.TicketID, b.pnr_number, COALESCE(p.FullName, '') as FullName, 
+                       COALESCE(t.TrainName, '') as TrainName,
+                       COALESCE(r.SourceStation, '') as SourceStation, 
+                       COALESCE(r.DestinationStation, '') as DestinationStation,
                        b.BookingDate, b.SeatStatus, pay.Amount, pay.Method, pay.payment_status
                 FROM bookings b
-                JOIN passengers p ON b.PassengerID = p.PassengerID
-                JOIN schedules s ON b.ScheduleID = s.ScheduleID
-                JOIN trains t ON s.TrainNumber = t.TrainNumber
-                JOIN routes r ON s.RouteID = r.RouteID
+                LEFT JOIN passengers p ON b.PassengerID = p.PassengerID
+                LEFT JOIN schedules s ON b.ScheduleID = s.ScheduleID
+                LEFT JOIN trains t ON s.TrainNumber = t.TrainNumber
+                LEFT JOIN routes r ON s.RouteID = r.RouteID
                 LEFT JOIN payments pay ON b.TicketID = pay.TicketID
                 ORDER BY b.TicketID DESC
+                LIMIT 200
             """
             cursor.execute(query)
         else:
-            query = """
-                SELECT b.TicketID, b.pnr_number, p.FullName, t.TrainName,
-                       r.SourceStation, r.DestinationStation,
+            # Find passenger IDs for this user
+            cursor.execute(
+                "SELECT PassengerID FROM passengers WHERE UserID = %s",
+                (user_id,),
+            )
+            passenger_ids = [row["PassengerID"] for row in cursor.fetchall()]
+
+            if not passenger_ids:
+                return render_template("bookings.html", bookings=[])
+
+            placeholders = ",".join(["%s"] * len(passenger_ids))
+            cursor.execute(
+                f"""
+                SELECT b.TicketID, b.pnr_number, COALESCE(p.FullName, '') as FullName, 
+                       COALESCE(t.TrainName, '') as TrainName,
+                       COALESCE(r.SourceStation, '') as SourceStation, 
+                       COALESCE(r.DestinationStation, '') as DestinationStation,
                        b.BookingDate, b.SeatStatus, pay.Amount, pay.Method, pay.payment_status
                 FROM bookings b
-                JOIN passengers p ON b.PassengerID = p.PassengerID
-                JOIN schedules s ON b.ScheduleID = s.ScheduleID
-                JOIN trains t ON s.TrainNumber = t.TrainNumber
-                JOIN routes r ON s.RouteID = r.RouteID
+                LEFT JOIN passengers p ON b.PassengerID = p.PassengerID
+                LEFT JOIN schedules s ON b.ScheduleID = s.ScheduleID
+                LEFT JOIN trains t ON s.TrainNumber = t.TrainNumber
+                LEFT JOIN routes r ON s.RouteID = r.RouteID
                 LEFT JOIN payments pay ON b.TicketID = pay.TicketID
-                WHERE p.UserID = %s
+                WHERE b.PassengerID IN ({placeholders})
                 ORDER BY b.TicketID DESC
-            """
-            cursor.execute(query, (user_id,))
+                LIMIT 200
+                """,
+                tuple(passenger_ids),
+            )
 
         bookings = cursor.fetchall()
         return render_template("bookings.html", bookings=bookings)
+    except Exception as e:
+        print(f"View bookings error: {e}")
+        return render_template("bookings.html", bookings=[])
     finally:
         cursor.close()
         conn.close()
