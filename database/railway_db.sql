@@ -267,7 +267,7 @@ CREATE TABLE audit_logs (
 -- ============================================
 INSERT INTO users (UserID, Username, PasswordHash, Email, FullName, Role) VALUES
 (1, 'guest_user', 'guest', 'guest@railway.com', 'Guest User', 'Passenger'),
-(2, 'admin', 'admin123', 'admin@railway.gov.bd', 'System Admin', 'Admin');
+(2, 'admin', 'ARNAB938@', 'admin@railway.gov.bd', 'System Admin', 'Admin');
 
 
 -- ============================================

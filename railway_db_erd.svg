@@ -1,0 +1,286 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 1800 1150" width="100%" height="100%" style="background-color: #1e1e2e; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;">
+    <defs>
+        <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+            <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/>
+        </filter>
+        <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#6c7086"/>
+        </marker>
+        <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <circle cx="5" cy="5" r="3" fill="#6c7086"/>
+        </marker>
+    </defs>
+
+    <!-- EDGES (Relationships) -->
+    <g fill="none" stroke="#6c7086" stroke-width="2" marker-start="url(#dot)" marker-end="url(#arrow)">
+        <!-- 1. passengers -> users -->
+        <path d="M 190 380 L 190 355" />
+        <!-- 2. audit_logs -> users -->
+        <path d="M 50 797.5 C 0 797.5, 0 200, 50 200" />
+        <!-- 3. route_stops -> routes -->
+        <path d="M 520 610 L 520 585" />
+        <!-- 4. route_stops.station_id -> stations -->
+        <path d="M 380 710 C 330 710, 330 200, 380 200" />
+        <!-- 5. fares -> routes -->
+        <path d="M 380 952.5 C 330 952.5, 330 480, 380 480" />
+        <!-- 6. schedules -> trains -->
+        <path d="M 850 300 L 850 280" />
+        <!-- 7. schedules.RouteID -> routes -->
+        <path d="M 710 412.5 C 670 412.5, 670 480, 660 480" />
+        <!-- 8. coaches -> trains -->
+        <path d="M 990 675 C 1040 675, 1040 162.5, 990 162.5" />
+        <!-- 9. seats -> coaches -->
+        <path d="M 850 830 L 850 805" />
+        <!-- 10. bookings -> passengers -->
+        <path d="M 1040 425 C 900 425, 400 505, 330 505" />
+        <!-- 11. bookings -> schedules -->
+        <path d="M 1040 390 C 1000 390, 1000 412.5, 990 412.5" />
+        <!-- 12. seat_availability.seat_id -> seats -->
+        <path d="M 1040 680 C 1000 680, 1000 917.5, 990 917.5" />
+        <!-- 13. seat_availability.ScheduleID -> schedules -->
+        <path d="M 1040 650 C 1000 650, 1000 450, 990 450" />
+        <!-- 14. payments -> bookings -->
+        <path d="M 1370 412.5 C 1330 412.5, 1330 425, 1320 425" />
+        <!-- 15. cancellations -> bookings -->
+        <path d="M 1370 650 C 1330 650, 1330 450, 1320 450" />
+        <!-- 16. cancellations.processed_by -> users -->
+        <path d="M 1650 650 C 1730 650, 1730 10, 190 10 L 190 50" />
+        <!-- 17. refunds -> cancellations -->
+        <path d="M 1510 780 L 1510 755" />
+    </g>
+
+    <!-- TABLES -->
+
+    <!-- USER MGMT DOMAIN -->
+    <g transform="translate(50, 50)">
+        <rect x="0" y="0" width="280" height="305" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#f38ba8" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">users</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">UserID</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#bac2de" font-size="14">Username</text> <text x="265" y="90" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR UQ</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">PasswordHash</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">Email</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR UQ</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">Phone</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">FullName</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="215" fill="#bac2de" font-size="14">Role</text> <text x="265" y="215" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="240" fill="#bac2de" font-size="14">is_active</text> <text x="265" y="240" fill="#a6adc8" font-size="12" text-anchor="end">BOOLEAN</text>
+        <text x="15" y="265" fill="#bac2de" font-size="14">created_at</text> <text x="265" y="265" fill="#a6adc8" font-size="12" text-anchor="end">TIMESTAMP</text>
+        <text x="15" y="290" fill="#bac2de" font-size="14">updated_at</text> <text x="265" y="290" fill="#a6adc8" font-size="12" text-anchor="end">TIMESTAMP</text>
+    </g>
+
+    <g transform="translate(50, 380)">
+        <rect x="0" y="0" width="280" height="255" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#f38ba8" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">passengers</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">PassengerID</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">UserID</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">PassportNumber</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">FullName</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">DateOfBirth</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">DATE</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">Gender</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="215" fill="#bac2de" font-size="14">Nationality</text> <text x="265" y="215" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="240" fill="#bac2de" font-size="14">created_at</text> <text x="265" y="240" fill="#a6adc8" font-size="12" text-anchor="end">TIMESTAMP</text>
+    </g>
+
+    <g transform="translate(50, 660)">
+        <rect x="0" y="0" width="280" height="280" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#f38ba8" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">audit_logs</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">log_id</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">UserID</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">action_type</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">table_name</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">record_id</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">INT</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">old_value</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">TEXT</text>
+        <text x="15" y="215" fill="#bac2de" font-size="14">new_value</text> <text x="265" y="215" fill="#a6adc8" font-size="12" text-anchor="end">TEXT</text>
+        <text x="15" y="240" fill="#bac2de" font-size="14">ip_address</text> <text x="265" y="240" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="265" fill="#bac2de" font-size="14">created_at</text> <text x="265" y="265" fill="#a6adc8" font-size="12" text-anchor="end">TIMESTAMP</text>
+    </g>
+
+    <!-- GEOGRAPHY & ROUTES DOMAIN -->
+    <g transform="translate(380, 50)">
+        <rect x="0" y="0" width="280" height="305" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#a6e3a1" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">stations</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">station_id</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#bac2de" font-size="14">station_code</text> <text x="265" y="90" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR UQ</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">station_name</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">station_name_bn</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">division</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">city</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="215" fill="#bac2de" font-size="14">latitude</text> <text x="265" y="215" fill="#a6adc8" font-size="12" text-anchor="end">DECIMAL</text>
+        <text x="15" y="240" fill="#bac2de" font-size="14">longitude</text> <text x="265" y="240" fill="#a6adc8" font-size="12" text-anchor="end">DECIMAL</text>
+        <text x="15" y="265" fill="#bac2de" font-size="14">is_junction</text> <text x="265" y="265" fill="#a6adc8" font-size="12" text-anchor="end">BOOLEAN</text>
+        <text x="15" y="290" fill="#bac2de" font-size="14">created_at</text> <text x="265" y="290" fill="#a6adc8" font-size="12" text-anchor="end">TIMESTAMP</text>
+    </g>
+
+    <g transform="translate(380, 380)">
+        <rect x="0" y="0" width="280" height="205" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#a6e3a1" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">routes</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">RouteID</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#bac2de" font-size="14">SourceStation</text> <text x="265" y="90" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">DestinationStation</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">Distance</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">DECIMAL</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">est_duration_min</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">INT</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">is_active</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">BOOLEAN</text>
+    </g>
+
+    <g transform="translate(380, 610)">
+        <rect x="0" y="0" width="280" height="205" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#a6e3a1" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">route_stops</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">stop_id</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">RouteID</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="115" fill="#cdd6f4" font-size="14" font-weight="bold">station_id</text> <text x="265" y="115" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">stop_sequence</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">INT</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">dist_from_start_km</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">DECIMAL</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">platform_number</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+    </g>
+
+    <g transform="translate(380, 840)">
+        <rect x="0" y="0" width="280" height="230" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#a6e3a1" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">fares</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">FareID</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">RouteID</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">ClassType</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">TotalAmount</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">DECIMAL</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">class_multiplier</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">DECIMAL</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">effective_from</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">DATE</text>
+        <text x="15" y="215" fill="#bac2de" font-size="14">effective_until</text> <text x="265" y="215" fill="#a6adc8" font-size="12" text-anchor="end">DATE</text>
+    </g>
+
+    <!-- TRAIN DOMAIN -->
+    <g transform="translate(710, 50)">
+        <rect x="0" y="0" width="280" height="230" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#89b4fa" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">trains</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">TrainNumber</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">VARCHAR PK</text>
+        <text x="15" y="90" fill="#bac2de" font-size="14">TrainName</text> <text x="265" y="90" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">train_type</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">ENUM</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">TotalSeats</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">INT</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">Speed</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">INT</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">is_active</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">BOOLEAN</text>
+        <text x="15" y="215" fill="#bac2de" font-size="14">created_at</text> <text x="265" y="215" fill="#a6adc8" font-size="12" text-anchor="end">TIMESTAMP</text>
+    </g>
+
+    <g transform="translate(710, 300)">
+        <rect x="0" y="0" width="280" height="230" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#89b4fa" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">schedules</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">ScheduleID</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">TrainNumber</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">VARCHAR FK</text>
+        <text x="15" y="115" fill="#cdd6f4" font-size="14" font-weight="bold">RouteID</text> <text x="265" y="115" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">DepartureTime</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">DATETIME</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">ArrivalTime</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">DATETIME</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">off_day</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">ENUM</text>
+        <text x="15" y="215" fill="#bac2de" font-size="14">is_active</text> <text x="265" y="215" fill="#a6adc8" font-size="12" text-anchor="end">BOOLEAN</text>
+    </g>
+
+    <g transform="translate(710, 550)">
+        <rect x="0" y="0" width="280" height="255" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#89b4fa" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">coaches</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">coach_id</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">TrainNumber</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">VARCHAR FK</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">coach_number</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">class_code</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">ENUM</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">class_name</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">total_seats</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">INT</text>
+        <text x="15" y="215" fill="#bac2de" font-size="14">coach_position</text> <text x="265" y="215" fill="#a6adc8" font-size="12" text-anchor="end">INT</text>
+        <text x="15" y="240" fill="#bac2de" font-size="14">has_ac</text> <text x="265" y="240" fill="#a6adc8" font-size="12" text-anchor="end">BOOLEAN</text>
+    </g>
+
+    <g transform="translate(710, 830)">
+        <rect x="0" y="0" width="280" height="180" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#89b4fa" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">seats</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">seat_id</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">coach_id</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">seat_number</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">seat_type</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">ENUM</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">is_available</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">BOOLEAN</text>
+    </g>
+
+    <!-- TRANSACTIONS TO MAIN -->
+    <g transform="translate(1040, 300)">
+        <rect x="0" y="0" width="280" height="255" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#cba6f7" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">bookings</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">TicketID</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">PassengerID</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="115" fill="#cdd6f4" font-size="14" font-weight="bold">ScheduleID</text> <text x="265" y="115" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">BookingDate</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">DATETIME</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">SeatStatus</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">DynPricingFactor</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">DECIMAL</text>
+        <text x="15" y="215" fill="#cdd6f4" font-size="14" font-weight="bold">seat_id</text> <text x="265" y="215" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="240" fill="#bac2de" font-size="14">pnr_number</text> <text x="265" y="240" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+    </g>
+
+    <g transform="translate(1040, 580)">
+        <rect x="0" y="0" width="280" height="205" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#cba6f7" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">seat_availability</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">availability_id</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">seat_id</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="115" fill="#cdd6f4" font-size="14" font-weight="bold">ScheduleID</text> <text x="265" y="115" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">journey_date</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">DATE</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">is_booked</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">BOOLEAN</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">locked_until</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">TIMESTAMP</text>
+    </g>
+
+    <!-- PAYMENTS & REFUNDS -->
+    <g transform="translate(1370, 300)">
+        <rect x="0" y="0" width="280" height="230" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#f9e2af" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">payments</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">PaymentID</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">TicketID</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">Amount</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">DECIMAL</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">PaymentDate</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">DATETIME</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">Method</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="190" fill="#bac2de" font-size="14">payment_status</text> <text x="265" y="190" fill="#a6adc8" font-size="12" text-anchor="end">ENUM</text>
+        <text x="15" y="215" fill="#bac2de" font-size="14">transaction_id</text> <text x="265" y="215" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+    </g>
+
+    <g transform="translate(1370, 550)">
+        <rect x="0" y="0" width="280" height="205" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#f9e2af" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">cancellations</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">CancellationID</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">TicketID</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">CancellationDate</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">DATETIME</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">Reason</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">TEXT</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">refund_percentage</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">DECIMAL</text>
+        <text x="15" y="190" fill="#cdd6f4" font-size="14" font-weight="bold">processed_by</text> <text x="265" y="190" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+    </g>
+
+    <g transform="translate(1370, 780)">
+        <rect x="0" y="0" width="280" height="180" fill="#181825" rx="8" ry="8" filter="url(#shadow)" />
+        <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 40 L 0 40 Z" fill="#f9e2af" />
+        <text x="140" y="26" fill="#11111b" font-family="Segoe UI, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">refunds</text>
+        <rect x="0" y="40" width="280" height="2" fill="#11111b" opacity="0.1" />
+        <text x="15" y="65" fill="#cdd6f4" font-size="14" font-weight="bold">RefundID</text> <text x="265" y="65" fill="#f9e2af" font-size="12" text-anchor="end">INT PK</text>
+        <text x="15" y="90" fill="#cdd6f4" font-size="14" font-weight="bold">CancellationID</text> <text x="265" y="90" fill="#89b4fa" font-size="12" text-anchor="end">INT FK</text>
+        <text x="15" y="115" fill="#bac2de" font-size="14">RefundAmount</text> <text x="265" y="115" fill="#a6adc8" font-size="12" text-anchor="end">DECIMAL</text>
+        <text x="15" y="140" fill="#bac2de" font-size="14">Status</text> <text x="265" y="140" fill="#a6adc8" font-size="12" text-anchor="end">VARCHAR</text>
+        <text x="15" y="165" fill="#bac2de" font-size="14">RefundDate</text> <text x="265" y="165" fill="#a6adc8" font-size="12" text-anchor="end">TIMESTAMP</text>
+    </g>
+
+</svg>
